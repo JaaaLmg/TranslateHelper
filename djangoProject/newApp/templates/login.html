@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.min.js' %}"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            width: 400px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #3a4a6b;
+        }
+        .btn-primary {
+            width: 100%;
+            background-color: #4e73df;
+            border: none;
+            padding: 10px;
+        }
+        .form-control:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>用户登录</h2>
+        <form method="post" action="/login/">
+            <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">用户名</label>
+              <input type="text" class="form-control" id="exampleInputEmail1" name="username">
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">密码</label>
+              <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+            </div>
+            <button type="submit" class="btn btn-primary">登录</button>
+            
+            <!-- Toast通知 -->
+            <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 9999">
+              <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-danger text-white">
+                  <strong class="me-auto">错误提示</strong>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                  {{ error }}
+                </div>
+              </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const error = "{{ error|escapejs }}";
+            if(error && error !== "None") {
+                const toastEl = document.getElementById('errorToast');
+                const toastBody = toastEl.querySelector('.toast-body');
+                toastBody.textContent = error;
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        });
+    </script>
+
+</body>
+</html>
