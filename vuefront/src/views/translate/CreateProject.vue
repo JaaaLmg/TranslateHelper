@@ -2,7 +2,7 @@
     <el-container>
     <el-header>
         <el-row type="flex" justify="space-between" align="middle">
-            <el-col :span="12"><h1 class="page-title">欢迎！</h1></el-col>
+            <el-col :span="12"><h1 class="page-title">欢迎, {{ this.username }}!</h1></el-col>
             <el-col :span="12" style="text-align: right;">
                 <el-button type="primary" plain icon="el-icon-user" class="action-button">登录</el-button>
             </el-col>
@@ -78,7 +78,14 @@
                 <el-table-column
                 prop="description"
                 label="项目简介"
-                width="500">
+                width="450">
+                </el-table-column>
+                <el-table-column
+                label="操作"
+                width="50">
+                    <el-row>
+                        <el-button type="danger" size="small" icon="el-icon-delete" circle></el-button>
+                    </el-row>    
                 </el-table-column>
             </el-table>
         </el-row>       
@@ -178,8 +185,18 @@
         form: {
           name: '',
           type:'',
-        }
+        },
+        username: '',
       }
+    },
+
+    mounted() {
+        axios.get(this.HOST+'/createproject/').then(response => {
+            this.username = response.data.username || '用户';
+        }).catch(error => {
+            console.error('获取用户名失败:', error);
+            this.username = '用户';
+        })
     }
 }
 </script>

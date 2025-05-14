@@ -4,7 +4,7 @@
         <el-row type="flex" justify="space-between" align="middle">
             <el-col :span="12"><h1 class="page-title">开始翻译</h1></el-col>
             <el-col :span="12" style="text-align: right;">
-                <el-button type="primary" plain @click="toEn()" class="action-button">一键机器翻译</el-button>
+                <el-button type="primary" plain @click="toEn()" class="action-button">导出文档</el-button>
             </el-col>
         </el-row>
     </el-header>
@@ -15,6 +15,8 @@
           :visible.sync="dialogVisible" 
           width="50%"
           :modal="false">
+          <el-button icon="el-icon-search" round style="margin-bottom:20px">检索</el-button>
+          <el-button icon="el-icon-plus" round style="margin-bottom:20px">添加词条</el-button>
           <el-form :model="editForm" label-width="100px">
             <el-form-item label="段号">
               <el-input v-model="editForm.id" disabled></el-input>

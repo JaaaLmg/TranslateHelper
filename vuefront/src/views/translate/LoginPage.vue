@@ -249,7 +249,7 @@ export default {
         if (!response.ok) {
           const errorData = await response.json();
           // 优先显示后端返回的error字段，其次显示message字段，最后使用默认提示
-          throw new Error(errorData.error || errorData.message || this.isRegister ? '注册失败' : '登录失败，请检查用户名和密码');
+          throw new Error(errorData.error || errorData.message || (this.isRegister ? '注册失败' : '登录失败，请检查用户名和密码'));
         }
 
         if (this.isRegister) {

@@ -5,6 +5,7 @@ from django.conf import settings
 import json
 import os
 from newApp.fileProcess import *
+from newApp.models import *
 
 responseDict={'message':'','text':[]}
 def login(request):
@@ -13,15 +14,27 @@ def login(request):
         username = data['username']
         password = data['password']
 
-        #校验
-        if username=='ja' and password=='123':
-            print("right")
-            response = HttpResponse("ok")
+        #在数据库中校验
+        userobject=UserInfo.objects.filter(username=username,password=password).first()
+        if userobject:
+        #登录成功
+            #设置cookie和session
+            request.session['info']={'username':username,'id':userobject.id}
+            response=HttpResponse("ok")
             return response
         else:
-            response=HttpResponse(json.dumps({"error":"用户名或密码错误"}))
-            response.status_code=444
+            response = HttpResponse(json.dumps({"error": "用户名或密码错误"}))
+            response.status_code = 444
             return response
+
+        # if username=='ja' and password=='123':
+        #     print("right")
+        #     response = HttpResponse("ok")
+        #     return response
+        # else:
+        #     response=HttpResponse(json.dumps({"error":"用户名或密码错误"}))
+        #     response.status_code=444
+        #     return response
 
 def register(request):
     if request.method == "POST":
@@ -64,4 +77,9 @@ def createproject(request):
     if request.method == "POST":
         response = HttpResponse("ok")
         return response
+    elif request.method == "GET":
+        username = request.session.get('info').get('username')
+        #print(username)
+        responseInfo={'username':username}
+        return JsonResponse(responseInfo)
 # Create your views here.
