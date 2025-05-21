@@ -26,5 +26,7 @@ urlpatterns = [
     path("translate/", translate),
     path("uploadfile/",uploadfile),
     path("createproject/",createproject),
+    path("memory/",searchMemory),
+    path("term/",searchTerm),
     path("",startnow),
 ]

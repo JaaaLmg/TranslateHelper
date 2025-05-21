@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 from django.conf import settings
 
 from spire.pdf import PdfDocument
