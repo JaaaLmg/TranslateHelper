@@ -98,28 +98,24 @@
                 label="原文"
                 width="180">
                 <template slot-scope="scope">
-                  <el-input v-if="scope.row.isEdit" class="item" v-model="scope.row.origin" placeholder="请输入内容"></el-input>
-                  <span v-else style="margin-left: 10px">{{ scope.row.origin }}</span>
+                  <span style="margin-left: 10px">{{ scope.row.origin }}</span>
                 </template>
               </el-table-column>
               <el-table-column
                 label="译文"
                 width="180">
                 <template slot-scope="scope">
-                  <el-input v-if="scope.row.isEdit" class="item" v-model="scope.row.target" placeholder="请输入内容"></el-input>
-                  <span v-else style="margin-left: 10px">{{ scope.row.target }}</span>
+                  <span style="margin-left: 10px">{{ scope.row.target }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作">
+              <el-table-column
+                label="操作"
+                width="120">
                 <template slot-scope="scope">
                   <el-button
                     size="mini"
-                    style="margin-right: 5px;"
-                    @click="handleMemoryEdit(scope.row)">编辑</el-button>
-                  <el-button
-                    size="mini"
                     type="danger"
-                    @click="handleMemoryUpdate(scope.row)">保存</el-button>
+                    @click="handleDeleteMemory(scope.row)">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -162,36 +158,31 @@
                 label="原文"
                 width="180">
                 <template slot-scope="scope">
-                  <el-input v-if="scope.row.isEdit" class="item" v-model="scope.row.origin" placeholder="请输入内容"></el-input>
-                  <span v-else style="margin-left: 10px">{{ scope.row.origin }}</span>
+                  <span style="margin-left: 10px">{{ scope.row.origin }}</span>
                 </template>
               </el-table-column>
               <el-table-column
                 label="译文"
                 width="180">
                 <template slot-scope="scope">
-                  <el-input v-if="scope.row.isEdit" class="item" v-model="scope.row.target" placeholder="请输入内容"></el-input>
-                  <span v-else style="margin-left: 10px">{{ scope.row.target }}</span>
+                  <span style="margin-left: 10px">{{ scope.row.target }}</span>
                 </template>
               </el-table-column>
               <el-table-column
                 label="注释"
                 width="180">
                 <template slot-scope="scope">
-                  <el-input v-if="scope.row.isEdit" class="item" v-model="scope.row.description" placeholder="请输入内容"></el-input>
-                  <span v-else style="margin-left: 10px">{{ scope.row.description }}</span>
+                  <span style="margin-left: 10px">{{ scope.row.description }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作">
+              <el-table-column
+                label="操作"
+                width="120">
                 <template slot-scope="scope">
                   <el-button
                     size="mini"
-                    style="margin-right: 5px;"
-                    @click="handleTermEdit(scope.row)">编辑</el-button>
-                  <el-button
-                    size="mini"
                     type="danger"
-                    @click="handleTermUpdate(scope.row)">保存</el-button>
+                    @click="handleDeleteTerm(scope.row)">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -248,7 +239,7 @@
               <el-input v-model="editForm.id" disabled></el-input>
             </el-form-item>
             <el-form-item label="原文">
-              <el-input type="textarea" v-model="editForm.origin" disabled :rows="9"></el-input>
+              <el-input type="textarea" v-model="editForm.origin" :rows="9"></el-input>
             </el-form-item>
             <el-form-item label="译文">
               <el-input type="textarea" v-model="editForm.target" :rows="9"></el-input>
@@ -282,11 +273,93 @@
             prop="origin"
             label="原文"
             width="500">
+            <template slot-scope="scope">
+              <div>
+                <template v-for="(segment, index) in processText(scope.row.origin)">
+                  <el-popover
+                    v-if="segment.isTerm"
+                    :key="index"
+                    placement="top"
+                    trigger="hover"
+                    width="250">
+                    <div class="term-info-card">
+                      <div class="term-info-item">
+                        <div class="term-info-label">译文</div>
+                        <div class="term-info-content">{{ segment.term.target }}</div>
+                      </div>
+                      <div v-if="segment.term.description" class="term-info-item">
+                        <div class="term-info-label">注释</div>
+                        <div class="term-info-content">{{ segment.term.description }}</div>
+                      </div>
+                    </div>
+                    <span slot="reference" class="term-highlight">{{ segment.text }}</span>
+                  </el-popover>
+                  <el-popover
+                    v-else-if="segment.isMemory"
+                    :key="index"
+                    placement="top"
+                    trigger="hover"
+                    width="250">
+                    <div class="term-info-card">
+                      <div class="term-info-item">
+                        <div class="term-info-label">记忆库译文</div>
+                        <div class="term-info-content">{{ segment.memory.target }}</div>
+                        <div class="copy-buttons-container">
+                          <el-button 
+                            size="mini" 
+                            type="text" 
+                            icon="el-icon-document-copy"
+                            class="copy-button copy-source"
+                            @click="copyToClipboard(segment.memory.origin)">
+                            复制原文
+                          </el-button>
+                          <el-button 
+                            size="mini" 
+                            type="text" 
+                            icon="el-icon-document-copy"
+                            class="copy-button copy-target"
+                            @click="copyToClipboard(segment.memory.target)">
+                            复制译文
+                          </el-button>
+                        </div>
+                      </div>
+                    </div>
+                    <span slot="reference" class="memory-highlight">{{ segment.text }}</span>
+                  </el-popover>
+                  <span v-else :key="index">{{ segment.text }}</span>
+                </template>
+              </div>
+            </template>
             </el-table-column>
             <el-table-column
             prop="target"
             label="译文"
             width="500">
+            <template slot-scope="scope">
+              <div>
+                <template v-for="(segment, index) in processText(scope.row.target)">
+                  <el-popover
+                    v-if="segment.isTerm"
+                    :key="index"
+                    placement="top"
+                    trigger="hover"
+                    width="250">
+                    <div class="term-info-card">
+                      <div class="term-info-item">
+                        <div class="term-info-label">译文</div>
+                        <div class="term-info-content">{{ segment.term.target }}</div>
+                      </div>
+                      <div v-if="segment.term.description" class="term-info-item">
+                        <div class="term-info-label">注释</div>
+                        <div class="term-info-content">{{ segment.term.description }}</div>
+                      </div>
+                    </div>
+                    <span slot="reference" class="term-highlight">{{ segment.text }}</span>
+                  </el-popover>
+                  <span v-else :key="index">{{ segment.text }}</span>
+                </template>
+              </div>
+            </template>
             </el-table-column>
             <el-table-column
             prop="notes"
@@ -448,7 +521,8 @@
       },
 
       loadAll() {
-        return [{'value':'terminology','label':'术语库'},{'value':'memory','label':'记忆库'}];
+        return [];
+        //return [{'value':'terminology','label':'术语库'},{'value':'memory','label':'记忆库'}];
       },
       handleSelect(item) {
         console.log(item);
@@ -470,8 +544,7 @@
         }).then(response => {
           this.memorySearchResults = response.data.memoryData.map(item => ({
             origin: item.origin,
-            target: item.target,
-            isEdit:false
+            target: item.target
           }));
           this.memorySearchResultVisible = true;
         }).catch(error => {
@@ -498,8 +571,7 @@
           this.termSearchResults = response.data.termData.map(item => ({
             origin: item.origin,
             target: item.target,
-            description: item.description,
-            isEdit:false
+            description: item.description
           }));
           this.termSearchResultVisible = true;
         }).catch(error => {
@@ -548,6 +620,182 @@
           this.$message.error('保存失败: ' + error.message);
         });
       },
+
+      fetchAllTerminology() {
+        axios.get(this.HOST + '/getAllTerminology/', {
+          params: {
+            projectId: this.$store.getters.getSelectedPrjId,
+          },
+          headers: this.headers
+        }).then(response => {
+          this.allTerminology = response.data.termData;
+        }).catch(error => {
+          this.$message.error('获取术语库失败: ' + error.message);
+        });
+      },
+
+      fetchAllMemory() {
+        axios.get(this.HOST + '/getAllMemory/', {
+          params: {
+            projectId: this.$store.getters.getSelectedPrjId,
+          },
+          headers: this.headers
+        }).then(response => {
+          this.allMemory = response.data.memoryData;
+        }).catch(error => {
+          this.$message.error('获取记忆库失败: ' + error.message);
+        });
+      },
+
+      processText(text) {
+        if (!text) return [{text: '', isTerm: false, isMemory: false}];
+        
+        let segments = [];
+        let lastIndex = 0;
+        let matches = [];
+        
+        // 收集所有术语匹配
+        this.allTerminology.forEach(term => {
+          const regex = new RegExp(term.origin, 'gi');
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            matches.push({
+              index: match.index,
+              length: match[0].length,
+              text: match[0],
+              type: 'term',
+              data: term
+            });
+          }
+        });
+
+        // 收集所有记忆库匹配
+        this.allMemory.forEach(memory => {
+          const regex = new RegExp(memory.origin, 'gi');
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            matches.push({
+              index: match.index,
+              length: match[0].length,
+              text: match[0],
+              type: 'memory',
+              data: memory
+            });
+          }
+        });
+
+        // 按位置排序
+        matches.sort((a, b) => a.index - b.index);
+
+        // 处理重叠
+        for (let i = matches.length - 1; i > 0; i--) {
+          if (matches[i].index < matches[i-1].index + matches[i-1].length) {
+            matches.splice(i, 1);
+          }
+        }
+
+        // 生成段落
+        lastIndex = 0;
+        matches.forEach(match => {
+          // 添加匹配前的普通文本
+          if (match.index > lastIndex) {
+            segments.push({
+              text: text.slice(lastIndex, match.index),
+              isTerm: false,
+              isMemory: false
+            });
+          }
+          
+          // 添加匹配的文本
+          segments.push({
+            text: match.text,
+            isTerm: match.type === 'term',
+            isMemory: match.type === 'memory',
+            term: match.type === 'term' ? match.data : null,
+            memory: match.type === 'memory' ? match.data : null
+          });
+          
+          lastIndex = match.index + match.length;
+        });
+        
+        // 添加剩余文本
+        if (lastIndex < text.length) {
+          segments.push({
+            text: text.slice(lastIndex),
+            isTerm: false,
+            isMemory: false
+          });
+        }
+        
+        return segments;
+      },
+
+      // 添加复制到剪贴板的方法
+      copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          this.$message({
+            message: '已复制到剪贴板',
+            type: 'success',
+            duration: 1500
+          });
+        }).catch(() => {
+          this.$message.error('复制失败，请重试');
+        });
+      },
+
+      // 添加删除记忆库条目的方法
+      handleDeleteMemory(row) {
+        this.$confirm('确认删除该记忆库条目吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          axios.post(this.HOST + '/deleteMemory/', {
+            projectId: this.$store.getters.getSelectedPrjId,
+            origin: row.origin
+          }).then(response => {
+            this.$message.success(response.data.message);
+            // 从列表中移除该条目
+            const index = this.memorySearchResults.findIndex(item => item.origin === row.origin);
+            if (index > -1) {
+              this.memorySearchResults.splice(index, 1);
+            }
+            // 重新获取所有记忆库内容以更新高亮显示
+            this.fetchAllMemory();
+          }).catch(error => {
+            this.$message.error(error.response?.data?.message || '删除失败');
+          });
+        }).catch(() => {
+          this.$message.info('已取消删除');
+        });
+      },
+
+      // 添加删除术语库条目的方法
+      handleDeleteTerm(row) {
+        this.$confirm('确认删除该术语库条目吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          axios.post(this.HOST + '/deleteTerm/', {
+            projectId: this.$store.getters.getSelectedPrjId,
+            origin: row.origin
+          }).then(response => {
+            this.$message.success(response.data.message);
+            // 从列表中移除该条目
+            const index = this.termSearchResults.findIndex(item => item.origin === row.origin);
+            if (index > -1) {
+              this.termSearchResults.splice(index, 1);
+            }
+            // 重新获取所有术语库内容以更新高亮显示
+            this.fetchAllTerminology();
+          }).catch(error => {
+            this.$message.error(error.response?.data?.message || '删除失败');
+          });
+        }).catch(() => {
+          this.$message.info('已取消删除');
+        });
+      },
     },
     
     data() {
@@ -591,6 +839,8 @@
         termAddVisible: false,
         termSearchResults:[],
         termSearchLoading:false,
+        allTerminology: [],
+        allMemory: [],
       }
     },
     mounted(){
@@ -600,6 +850,8 @@
           }
         }).then(response => {
             this.tableData = response.data.text;
+            this.fetchAllTerminology();
+            this.fetchAllMemory();
         })
 
         this.restaurants = this.loadAll();
@@ -723,5 +975,81 @@
   .dialog-footer {
     text-align: right; /* 将关闭按钮对齐到右侧 */
   }
+}
+
+.el-table .cell span {
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin: 0 2px;
+}
+
+.term-highlight {
+    background-color: #87CEFA;  /* Light Sky Blue */
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin: 0 2px;
+    cursor: pointer;
+}
+
+.memory-highlight {
+    color: #DAA520;  /* Golden Rod */
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.term-info-card {
+    padding: 8px;
+}
+
+.term-info-item {
+    margin-bottom: 8px;
+}
+
+.term-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.term-info-label {
+    font-size: 13px;
+    color: #909399;
+    margin-bottom: 4px;
+}
+
+.term-info-content {
+    font-size: 14px;
+    color: #303133;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.term-popover {
+    border-radius: 8px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.copy-buttons-container {
+    display: flex;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.copy-button {
+    padding: 0;
+}
+
+.copy-source {
+    color: #67C23A;  /* Element UI 的成功绿色 */
+}
+
+.copy-source:hover {
+    color: #85ce61;
+}
+
+.copy-target {
+    color: #409EFF;  /* Element UI 的主题蓝色 */
+}
+
+.copy-target:hover {
+    color: #66b1ff;
 }
 </style>

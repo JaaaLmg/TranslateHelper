@@ -28,5 +28,9 @@ urlpatterns = [
     path("createproject/",createproject),
     path("memory/",searchMemory),
     path("term/",searchTerm),
+    path("getAllTerminology/", getAllTerminology),
+    path("getAllMemory/", getAllMemory),
+    path("deleteMemory/", deleteMemory),
+    path("deleteTerm/", deleteTerm),
     path("",startnow),
 ]

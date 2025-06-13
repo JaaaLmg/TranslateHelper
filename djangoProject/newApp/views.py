@@ -248,3 +248,84 @@ def searchTerm(request):
         responseDict['termData']=termList
         responseDict['message']="检索完成"
         return JsonResponse(responseDict)
+
+def getAllTerminology(request):
+    if request.method == "GET":
+        responseDict = {'message': '', 'termData': []}
+
+        projectId = request.GET.get('projectId')
+        userid = request.session.get('info').get('id')
+        userproject = ProjectInfo.objects.filter(user_id=userid).filter(projectId=projectId).first()
+        targetPrjId = userproject.id
+        termSet = TerminologyInfo.objects.filter(project_id=targetPrjId).order_by('-id')
+
+        termList = []
+        for term in termSet:
+            termDict = {}
+            termDict['origin'] = term.origin
+            termDict['target'] = term.target
+            termDict['description'] = term.description
+            termList.append(termDict)
+
+        responseDict['termData'] = termList
+        responseDict['message'] = "检索完成"
+        return JsonResponse(responseDict)
+
+def getAllMemory(request):
+    if request.method == "GET":
+        responseDict = {'message': '', 'memoryData': []}
+
+        projectId = request.GET.get('projectId')
+        userid = request.session.get('info').get('id')
+        userproject = ProjectInfo.objects.filter(user_id=userid).filter(projectId=projectId).first()
+        targetPrjId = userproject.id
+        memorySet = MemoryInfo.objects.filter(project_id=targetPrjId).order_by('-id')
+
+        memoryList = []
+        for memory in memorySet:
+            memoryDict = {}
+            memoryDict['origin'] = memory.origin
+            memoryDict['target'] = memory.target
+            memoryList.append(memoryDict)
+
+        responseDict['memoryData'] = memoryList
+        responseDict['message'] = "检索完成"
+        return JsonResponse(responseDict)
+
+def deleteMemory(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        projectId = data.get('projectId')
+        origin = data.get('origin')
+        userid = request.session.get('info').get('id')
+        userproject = ProjectInfo.objects.filter(user_id=userid).filter(projectId=projectId).first()
+        targetPrjId = userproject.id
+
+        try:
+            memory = MemoryInfo.objects.filter(project_id=targetPrjId).filter(origin=origin).first()
+            if memory:
+                memory.delete()
+                return JsonResponse({'message': '删除成功！'})
+            else:
+                return JsonResponse({'message': '未找到要删除的条目'}, status=404)
+        except Exception as e:
+            return JsonResponse({'message': f'删除失败: {str(e)}'}, status=500)
+
+def deleteTerm(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        projectId = data.get('projectId')
+        origin = data.get('origin')
+        userid = request.session.get('info').get('id')
+        userproject = ProjectInfo.objects.filter(user_id=userid).filter(projectId=projectId).first()
+        targetPrjId = userproject.id
+
+        try:
+            term = TerminologyInfo.objects.filter(project_id=targetPrjId).filter(origin=origin).first()
+            if term:
+                term.delete()
+                return JsonResponse({'message': '删除成功！'})
+            else:
+                return JsonResponse({'message': '未找到要删除的条目'}, status=404)
+        except Exception as e:
+            return JsonResponse({'message': f'删除失败: {str(e)}'}, status=500)
