@@ -12,3 +12,5 @@
 | HTTP客户端 | Axios 1.8 |
 | 后端框架   | Django 5.1.3 |
 | 数据库     |  MySQL 8.0 |
+
+![](./assets/catmeme.gif)
